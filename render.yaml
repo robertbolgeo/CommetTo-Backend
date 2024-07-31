@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: commetto-frontend
+    runtime: node
+    repo: https://github.com/FilippoQuattrocchi/CommetTo-Frontend
+    plan: free
+    envVars:
+      - key: VITE_APP_BASE_URL
+        sync: false
+      - key: VITE_APP_PORT
+        sync: false
+    region: singapore
+    buildCommand: npm run build
+    startCommand: npm run preview
+    rootDir: client
+  - type: web
+    name: commetto-backend
+    runtime: node
+    repo: https://github.com/FilippoQuattrocchi/CommetTo-Backend
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+    region: singapore
+    buildCommand: npm run build
+    startCommand: npm run start
+    rootDir: server
+version: "1"
