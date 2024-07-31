@@ -7,7 +7,23 @@ dotenv.config({path: './.env.local'});
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/event/:id", (req: Request, res: Response) => {
+  res.send("Express + TypeScript Server");
+});
+
+app.post("/event/:id", (req: Request, res: Response) => {
+  res.send("Express + TypeScript Server");
+});
+
+app.put("/event/:id", (req: Request, res: Response) => {
+  res.send("Express + TypeScript Server");
+});
+
+app.delete("/event/:id", (req: Request, res: Response) => {
+  res.send("Express + TypeScript Server");
+});
+
+app.get("/allEvents/info", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
