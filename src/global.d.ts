@@ -19,8 +19,27 @@ interface schedule {
     description: string
 }
 
+interface infoForPage {
+    overview: event,
+    schedule: schedule[]
+}
+
+interface infoForPageFromKnex {
+    event_id: number,
+    event_name: string
+    event_desc: string,
+    event_date: Date,
+    updated_at: Date,
+    schedule_id: number,
+    schedule_name: string,
+    time: Date,
+    schedule_desc: string
+}
+
 export {
     event,
     eventInfo,
-    schedule
+    schedule,
+    infoForPage,
+    infoForPageFromKnex
 }
