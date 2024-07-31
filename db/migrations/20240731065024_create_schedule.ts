@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
         table.increments('id').primary();
         table.string("name",24);
         table.text("description");
-        table.time("time").notNullable();
+        table.timestamp("time").notNullable();
     });
 }
 
