@@ -12,11 +12,6 @@ function castResult(result: infoForPageFromKnex[]) {
         },
         schedule: []
     }
-    // forController.overview.id = result[0].event_id;
-    // forController.overview.name = result[0].event_name;
-    // forController.overview.description = result[0].event_desc;
-    // forController.overview.date = result[0].event_date
-    // forController.overview.updated_at = result[0].updated_at
     for (const r of result) {
         forController.schedule.push({
             id: r.schedule_id,
