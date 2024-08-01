@@ -87,9 +87,60 @@ async function insertToEventAndSchedule(eventIdObj: { id: number }[], scheduleId
     return { eventId, scheduleIds }
 }
 
+//Update
+async function updateEvent(updatedEvent: infoForPageForJSON) {
+    const event: eventForJSON = updatedEvent.overview
+    const schedules: scheduleForJSON[] = updatedEvent.schedule
+    const updateddEventId: number = await updateToEvent(event)
+    const updatedScheduleIds: number[] = await updateToSchedule(schedules)
+    const deleted = await deleteToEventAndSchedule(event.id)
+    const eventToSchedule = await insertToEventAndSchedule([{ id: updateddEventId }], updatedScheduleIds.map((i) => { return { id: i } }))
+    return eventToSchedule;
+}
+
+async function updateToEvent(event: eventForJSON) {
+    const casted: event = {
+        id: event.id,
+        name: event.name,
+        description: event.description,
+        date: new Date(event.date),
+        updated_at: new Date(event.updated_at)
+    }
+    const updateddEventId: number = await database("event").update({
+        "name": casted.name,
+        "description": casted.description, "date": casted.date, "updated_at": casted.updated_at
+    }).where("id", "=", casted.id)
+    return updateddEventId;
+}
+
+async function updateToSchedule(schedules: scheduleForJSON[]) {
+    const updatedScheduleIds: number[] = []
+    for (const s of schedules) {
+        console.log(s)
+        const casted: schedule = {
+            id: s.id,
+            name: s.name,
+            time: new Date(s.time),
+            description: s.description
+        }
+        updatedScheduleIds.push(s.id)
+        const updateddId: number = await database("schedule").update({
+            "name": casted.name,
+            "description": casted.description, "time": casted.time
+        }).where("id", "=", casted.id)
+    }
+    return updatedScheduleIds;
+}
+
+
+async function deleteToEventAndSchedule(eventId: number) {
+    return await database.from("event_schedule").where("event_id", "=", eventId).del()
+}
+
 
 
 export {
     selectDetailOfEvent,
-    insertDetailOfEvent
+    insertDetailOfEvent,
+    updateEvent
 }

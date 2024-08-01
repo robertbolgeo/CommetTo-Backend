@@ -1,7 +1,7 @@
 // src/index.js {path: './.env.local'}
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import { handleGETOneEvent,handlePostOneEvent } from "./event/event.controller"
+import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent } from "./event/event.controller"
 
 dotenv.config({ path: './.env.local' });
 
@@ -16,19 +16,20 @@ app.get("/event/:id", async (req: Request, res: Response) => {
 });
 
 app.post("/event", async (req: Request, res: Response) => {
-  const result = await handlePostOneEvent(req,res)
+  const result = await handlePostOneEvent(req, res)
   res.json(result);
 });
 
-app.put("/event/:id", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+app.put("/event", (req: Request, res: Response) => {
+  const result = handlePutOneEvent(req, res)
+  res.json(result)
 });
 
 app.delete("/event/:id", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.get("/allEvents/info", (req: Request, res: Response) => {
+app.get("/all-events/info", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
