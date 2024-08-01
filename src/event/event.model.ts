@@ -1,22 +1,17 @@
-import { event, infoForPage, infoForPageFromKnex } from "../global";
+import { event, infoForPage, infoForPageForJSON, infoForPageFromKnex, schedule, eventForJSON, scheduleForJSON } from "../global";
 import { database } from "../knex";
 
 function castResult(result: infoForPageFromKnex[]) {
     let forController: infoForPage = {
         overview: {
-            id: 0,
-            name: "",
-            description: "",
-            date: new Date(),
-            updated_at: new Date()
+            id: result[0].event_id,
+            name: result[0].event_name,
+            description: result[0].event_desc,
+            date: new Date(result[0].event_date),
+            updated_at: new Date(result[0].updated_at)
         },
         schedule: []
     }
-    forController.overview.id = result[0].event_id;
-    forController.overview.name = result[0].event_name;
-    forController.overview.description = result[0].event_desc;
-    forController.overview.date = result[0].event_date
-    forController.overview.updated_at = result[0].updated_at
     for (const r of result) {
         forController.schedule.push({
             id: r.schedule_id,
@@ -38,6 +33,63 @@ async function selectDetailOfEvent(eventId: string) {
     return casted;
 }
 
+async function insertDetailOfEvent(newEvent: infoForPageForJSON) {
+    const event: eventForJSON = newEvent.overview
+    const schedules: scheduleForJSON[] = newEvent.schedule
+    const insertedEventId = await insertToEvent(event)
+    const insertedScheduleIds = await insertToSchedule(schedules)
+    const eventToSchedule = await insertToEventAndSchedule(insertedEventId, insertedScheduleIds)
+    return eventToSchedule;
+}
+
+async function insertToEvent(newEvent: eventForJSON) {
+    const casted: event = {
+        id: newEvent.id,
+        name: newEvent.name,
+        description: newEvent.description,
+        date: new Date(newEvent.date),
+        updated_at: new Date(newEvent.updated_at)
+    }
+    const insertedEventId: { id: number }[] = await database("event").insert({
+        "name": casted.name,
+        "description": casted.description, "date": casted.date, "updated_at": casted.updated_at
+    }, ["id"])
+    return insertedEventId;
+}
+
+async function insertToSchedule(schedules: scheduleForJSON[]) {
+    const insertedScheduleIds: { id: number }[] = []
+    for (const s of schedules) {
+        const casted: schedule = {
+            id: s.id,
+            name: s.name,
+            time: new Date(s.time),
+            description: s.description
+        }
+        const insertedId: { id: number }[] = await database("schedule").insert({
+            "name": casted.name,
+            "description": casted.description, "time": casted.time
+        }, ["id"])
+        insertedScheduleIds.push(insertedId[0])
+    }
+    return insertedScheduleIds;
+}
+
+async function insertToEventAndSchedule(eventIdObj: { id: number }[], scheduleIdsObj: { id: number }[]) {
+    const eventId = eventIdObj[0].id
+    const scheduleIds = scheduleIdsObj.map((obj) => obj.id)
+    for (const s of scheduleIds) {
+        await database("event_schedule").insert({
+            "event_id": eventId,
+            "schedule_id": s
+        })
+    }
+    return { eventId, scheduleIds }
+}
+
+
+
 export {
-    selectDetailOfEvent
+    selectDetailOfEvent,
+    insertDetailOfEvent
 }
