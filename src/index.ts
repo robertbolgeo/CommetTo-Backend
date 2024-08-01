@@ -1,7 +1,7 @@
 // src/index.js {path: './.env.local'}
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent, handleDeleteOneEvent } from "./event/event.controller"
+import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent, handleDeleteOneEvent, handleGetAllEventsInfo } from "./event/event.controller"
 
 dotenv.config({ path: './.env.local' });
 
@@ -25,13 +25,14 @@ app.put("/event", (req: Request, res: Response) => {
   res.json(result)
 });
 
-app.delete("/event/:id", async(req: Request, res: Response) => {
-  const reuslt = await handleDeleteOneEvent(req,res)
+app.delete("/event/:id", async (req: Request, res: Response) => {
+  const reuslt = await handleDeleteOneEvent(req, res)
   res.send();
 });
 
-app.get("/all-events/info", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+app.get("/all-events/info", async (req: Request, res: Response) => {
+  const result = await handleGetAllEventsInfo(req, res);
+  res.json(result);
 });
 
 app.listen(port, () => {

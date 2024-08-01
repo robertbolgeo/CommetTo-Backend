@@ -1,4 +1,4 @@
-import { event, infoForPage, infoForPageForJSON, infoForPageFromKnex, schedule, eventForJSON, scheduleForJSON } from "../global";
+import { event, infoForPage, eventInfo, infoForPageForJSON, infoForPageFromKnex, schedule, eventForJSON, scheduleForJSON } from "../global";
 import { database } from "../knex";
 
 function castResult(result: infoForPageFromKnex[]) {
@@ -37,6 +37,12 @@ async function selectDetailOfEvent(eventId: string) {
 async function selectSchedules(eventId: string) {
     const result: { schedule_id: number }[] = await database().from("event_schedule")
         .select("schedule_id").where("event_id", eventId)
+    return result;
+}
+
+async function selectEachEventInfo() {
+    const result: eventInfo[] = await database().from("event")
+        .select("id", "name", "date")
     return result;
 }
 
@@ -161,13 +167,10 @@ async function deleteToSchedule(scheduleIds: number[]) {
     return await database.from("schedule").whereIn("id", scheduleIds).del()
 }
 
-
-
-
-
 export {
     selectDetailOfEvent,
     insertDetailOfEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    selectEachEventInfo
 }
