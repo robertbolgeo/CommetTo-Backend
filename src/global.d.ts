@@ -5,6 +5,11 @@ interface event {
     date: Date,
     updated_at: Date
 }
+interface eventForJSON extends event{
+    id: number,
+    date: string,
+    updated_at: string
+}
 
 interface eventInfo {
     id: number,
@@ -19,9 +24,19 @@ interface schedule {
     description: string
 }
 
+interface scheduleForJSON extends schedule{
+    id: number,
+    time: string,
+}
+
 interface infoForPage {
     overview: event,
     schedule: schedule[]
+}
+
+interface infoForPageForJSON {
+    overview: eventForJSON,
+    schedule: scheduleForJSON[]
 }
 
 interface infoForPageFromKnex {
@@ -41,5 +56,8 @@ export {
     eventInfo,
     schedule,
     infoForPage,
-    infoForPageFromKnex
+    infoForPageFromKnex,
+    eventForJSON,
+    scheduleForJSON,
+    infoForPageForJSON
 }
