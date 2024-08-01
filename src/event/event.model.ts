@@ -23,6 +23,7 @@ function castResult(result: infoForPageFromKnex[]) {
     return forController;
 }
 
+//select
 async function selectDetailOfEvent(eventId: string) {
     const result = await database().from("event")
         .leftJoin("event_schedule", "event_schedule.event_id", "event.id")
@@ -33,6 +34,13 @@ async function selectDetailOfEvent(eventId: string) {
     return casted;
 }
 
+async function selectSchedules(eventId: string) {
+    const result: { schedule_id: number }[] = await database().from("event_schedule")
+        .select("schedule_id").where("event_id", eventId)
+    return result;
+}
+
+//insert
 async function insertDetailOfEvent(newEvent: infoForPageForJSON) {
     const event: eventForJSON = newEvent.overview
     const schedules: scheduleForJSON[] = newEvent.schedule
@@ -87,9 +95,79 @@ async function insertToEventAndSchedule(eventIdObj: { id: number }[], scheduleId
     return { eventId, scheduleIds }
 }
 
+//Update
+async function updateEvent(updatedEvent: infoForPageForJSON) {
+    const event: eventForJSON = updatedEvent.overview
+    const schedules: scheduleForJSON[] = updatedEvent.schedule
+    const updateddEventId: number = await updateToEvent(event)
+    const updatedScheduleIds: number[] = await updateToSchedule(schedules)
+    const deleted = await deleteToEventAndSchedule(event.id)
+    const eventToSchedule = await insertToEventAndSchedule([{ id: updateddEventId }], updatedScheduleIds.map((i) => { return { id: i } }))
+    return eventToSchedule;
+}
+
+async function updateToEvent(event: eventForJSON) {
+    const casted: event = {
+        id: event.id,
+        name: event.name,
+        description: event.description,
+        date: new Date(event.date),
+        updated_at: new Date(event.updated_at)
+    }
+    const updateddEventId: number = await database("event").update({
+        "name": casted.name,
+        "description": casted.description, "date": casted.date, "updated_at": casted.updated_at
+    }).where("id", "=", casted.id)
+    return updateddEventId;
+}
+
+async function updateToSchedule(schedules: scheduleForJSON[]) {
+    const updatedScheduleIds: number[] = []
+    for (const s of schedules) {
+        console.log(s)
+        const casted: schedule = {
+            id: s.id,
+            name: s.name,
+            time: new Date(s.time),
+            description: s.description
+        }
+        updatedScheduleIds.push(s.id)
+        const updateddId: number = await database("schedule").update({
+            "name": casted.name,
+            "description": casted.description, "time": casted.time
+        }).where("id", "=", casted.id)
+    }
+    return updatedScheduleIds;
+}
+
+//delete
+async function deleteEvent(eventId: string) {
+    const shcdules: { schedule_id: number }[] = await selectSchedules(eventId)
+    await deleteToEventAndSchedule(Number(eventId));
+    await deleteToSchedule(shcdules.map((s) => s.schedule_id))
+    await deleteToEvent(Number(eventId))
+    return;
+}
+
+async function deleteToEventAndSchedule(eventId: number) {
+    return await database.from("event_schedule").where("event_id", "=", eventId).del()
+}
+
+async function deleteToEvent(eventId: number) {
+    return await database.from("event").where("id", "=", eventId).del()
+}
+
+async function deleteToSchedule(scheduleIds: number[]) {
+    return await database.from("schedule").whereIn("id", scheduleIds).del()
+}
+
+
+
 
 
 export {
     selectDetailOfEvent,
-    insertDetailOfEvent
+    insertDetailOfEvent,
+    updateEvent,
+    deleteEvent
 }
