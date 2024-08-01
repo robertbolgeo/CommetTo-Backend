@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { event, eventInfo, infoForPage,infoForPageForJSON } from "../global";
-import { selectDetailOfEvent,insertDetailOfEvent, updateEvent } from "./event.model";
+import { selectDetailOfEvent,insertDetailOfEvent, updateEvent,deleteEvent } from "./event.model";
 dotenv.config({ path: './.env.local' });
 
 async function handleGETOneEvent(req: Request, res: Response) {
@@ -22,6 +22,12 @@ async function handlePutOneEvent(req: Request, res: Response){
     return updatedIdParis
 }
 
+async function handleDeleteOneEvent(req: Request, res: Response){
+    const eventId = req.params.id
+    const result = await deleteEvent(eventId)
+    return result
+}
+
 // async function handleGetAllEventsInfo(req: Request, res: Response) {
 //     const eventsInfo: eventInfo[] = await selectEachEventInfo()
 // }
@@ -29,5 +35,7 @@ async function handlePutOneEvent(req: Request, res: Response){
 export {
     handleGETOneEvent,
     handlePostOneEvent,
-    handlePutOneEvent
+    handlePutOneEvent,
+    handleDeleteOneEvent,
+    
 }

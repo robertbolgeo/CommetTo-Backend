@@ -23,6 +23,7 @@ function castResult(result: infoForPageFromKnex[]) {
     return forController;
 }
 
+//select
 async function selectDetailOfEvent(eventId: string) {
     const result = await database().from("event")
         .leftJoin("event_schedule", "event_schedule.event_id", "event.id")
@@ -33,6 +34,13 @@ async function selectDetailOfEvent(eventId: string) {
     return casted;
 }
 
+async function selectSchedules(eventId: string) {
+    const result: { schedule_id: number }[] = await database().from("event_schedule")
+        .select("schedule_id").where("event_id", eventId)
+    return result;
+}
+
+//insert
 async function insertDetailOfEvent(newEvent: infoForPageForJSON) {
     const event: eventForJSON = newEvent.overview
     const schedules: scheduleForJSON[] = newEvent.schedule
@@ -132,15 +140,34 @@ async function updateToSchedule(schedules: scheduleForJSON[]) {
     return updatedScheduleIds;
 }
 
+//delete
+async function deleteEvent(eventId: string) {
+    const shcdules: { schedule_id: number }[] = await selectSchedules(eventId)
+    await deleteToEventAndSchedule(Number(eventId));
+    await deleteToSchedule(shcdules.map((s) => s.schedule_id))
+    await deleteToEvent(Number(eventId))
+    return;
+}
 
 async function deleteToEventAndSchedule(eventId: number) {
     return await database.from("event_schedule").where("event_id", "=", eventId).del()
 }
+
+async function deleteToEvent(eventId: number) {
+    return await database.from("event").where("id", "=", eventId).del()
+}
+
+async function deleteToSchedule(scheduleIds: number[]) {
+    return await database.from("schedule").whereIn("id", scheduleIds).del()
+}
+
+
 
 
 
 export {
     selectDetailOfEvent,
     insertDetailOfEvent,
-    updateEvent
+    updateEvent,
+    deleteEvent
 }
