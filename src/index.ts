@@ -32,8 +32,7 @@ app.delete("/event/:id", async (req: Request, res: Response) => {
 
 app.get("/all-events/info", async (req: Request, res: Response) => {
   const result = await handleGetAllEventsInfo(req, res);
-  console.log(result)
-  res.send("Express + TypeScript Server");
+  res.json(result);
 });
 
 app.listen(port, () => {
