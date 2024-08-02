@@ -41,7 +41,6 @@ app.delete("/event/:id", async (req: Request, res: Response) => {
 
 app.get("/all-events/info", async (req: Request, res: Response) => {
   const result = await handleGetAllEventsInfo(req, res);
-  console.log(result)
   res.json(result);
 });
 

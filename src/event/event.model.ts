@@ -130,7 +130,6 @@ async function updateToEvent(event: eventForJSON) {
 async function updateToSchedule(schedules: scheduleForJSON[]) {
     const updatedScheduleIds: number[] = []
     for (const s of schedules) {
-        console.log(s)
         const casted: schedule = {
             id: s.id,
             name: s.name,
