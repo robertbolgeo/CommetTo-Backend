@@ -1,3 +1,13 @@
+databases:
+  - name: commetto
+    databaseName: commetto
+    user: commetto_user
+    plan: free
+    region: singapore
+    ipAllowList:
+    - source: 0.0.0.0/0
+      description: everywhere
+    postgresMajorVersion: "14"
 services:
   - type: web
     name: commetto-frontend
@@ -12,7 +22,6 @@ services:
     region: singapore
     buildCommand: npm run build
     startCommand: npm run preview
-    rootDir: client
   - type: web
     name: commetto-backend
     runtime: node
@@ -24,5 +33,4 @@ services:
     region: singapore
     buildCommand: npm run build
     startCommand: npm run start
-    rootDir: server
 version: "1"
