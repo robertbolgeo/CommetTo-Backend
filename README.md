@@ -20,11 +20,30 @@ Express, Knex and Typescript
 Here's a brief intro about what a developer must do in order to start developing
 the project further:
 
+#### command for setup:
 ```shell
 git clone https://github.com/FilippoQuattrocchi/CommetTo-Frontend.git
 cd CommetTo-Frontend/
 npm install
 ```
+
+#### chage file setting:<br>
+You need to change some variables.<br>
+1. Change .env.example variables.
+```
+//.env.example file
+PORT = 3100 
+NODE_ENV = 
+DB_HOST = 127.0.0.1 
+DB_PORT = 5432 
+DB_USER = postgres 
+DB_PASSWORD =         ★You should add your password to connect postgres in local.
+DB_NAME = todoapp     ★You should change DB name you use.
+VITE_ORIGIN = http://localhost:4173     ★The "from" URL you allow access to server.
+```
+
+2. Copy .env.example, and change filename from .env.example to .env.local.
+
 
 ## File structure in src folder
 
