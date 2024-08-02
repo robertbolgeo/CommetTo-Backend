@@ -25,3 +25,19 @@ git clone https://github.com/FilippoQuattrocchi/CommetTo-Frontend.git
 cd CommetTo-Frontend/
 npm install
 ```
+
+## File structure in src folder
+
+src <br>
+│-global.d.ts //Type difinitions. <br>
+│-index.ts //Express server endpoints to maniplutate data in between frontend and backend.<br>
+│-knex.ts //knex settings<br>
+│<br>
+└─event<br>
+&emsp;&emsp;event.controller.ts //handle functions for http request. They call data manipulation functions which communicate with database, using knex. <br>
+&emsp;&emsp;event.model.ts //Communication functions with knex.<br>
+
+## Implementation details
+### Handle CORS
+It uses express middleware "CORS" and manually add response header "Access-Control-Allow-Methods" for GET, POST, PUT, DELETE method.
+You can define the origin which you allow to communicate with "VITE_ORIGIN" enviroment variable.
