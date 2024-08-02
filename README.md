@@ -34,9 +34,9 @@ src <br>
 │-knex.ts //knex settings<br>
 │<br>
 └─event<br>
-&emsp;&emsp;event.controller.ts //handle functions for http request.<br>
+&emsp;&emsp;│-event.controller.ts //handle functions for http request.<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;// They call data manipulation functions which communicate with database, using knex. <br>
-&emsp;&emsp;event.model.ts //Communication functions with knex.<br>
+&emsp;&emsp;└─event.model.ts //Communication functions with knex.<br>
 
 ## Implementation details
 ### Handle CORS
