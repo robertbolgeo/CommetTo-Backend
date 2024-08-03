@@ -1,8 +1,11 @@
 // src/index.js {path: './.env.local'}
-import express, { Express, Request, Response } from "express";
+import express, { Express, request, Request, Response, Router } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent, handleDeleteOneEvent, handleGetAllEventsInfo } from "./event/event.controller"
+const userController = require("./user/user.controller");
+import { database } from "./knex";
+import { loginRequest, registerRequest } from "./global";
 
 dotenv.config({ path: './.env.local' });
 
@@ -17,6 +20,31 @@ app.use(cors(corsOptions));
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE");
   next();
+});
+
+app.post("/login", async (req: Request, res: Response) => {
+  const userCredential: loginRequest = req.body;
+	const result = await database('user')
+		.select("id")
+		.where("username", userCredential.username)
+		.andWhere("password", userCredential.password)
+		.first();
+
+  if(result) res.json(result);
+  else res.sendStatus(500);
+	
+});
+
+app.post("/register", async (req: Request, res: Response) => {
+	const userCredential: registerRequest = req.body;
+  try {
+    const result = await database("user").insert(userCredential, ["id"]);
+    res.json(result);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+	
+
 });
 
 app.get("/event/:id", async (req: Request, res: Response) => {
