@@ -3,7 +3,6 @@ import express, { Express, request, Request, Response, Router } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent, handleDeleteOneEvent, handleGetAllEventsInfo } from "./event/event.controller"
-const userController = require("./user/user.controller");
 import bcrypt from "bcrypt";
 const saltRounds = 8;
 import { database } from "./knex";
