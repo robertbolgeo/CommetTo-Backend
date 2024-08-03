@@ -25,7 +25,6 @@ dotenv.config({ path: "./.env.local" });
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
-const saltRounds = 8;
 const corsOptions = {
 	origin: process.env.VITE_ORIGIN,
 };
@@ -37,7 +36,8 @@ app.use(function (req, res, next) {
 	next();
 });
 
-export const SECRET_KEY: Secret = "your-secret-key-here";
+export const SECRET_KEY: Secret = process.env.SECRET || "Secret-Key";
+const saltRounds = process.env.SALT || 8;
 
 export interface CustomRequest extends Request {
 	token: string | JwtPayload;
