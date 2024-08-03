@@ -4,6 +4,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent, handleDeleteOneEvent, handleGetAllEventsInfo } from "./event/event.controller"
 const userController = require("./user/user.controller");
+import bcrypt from "bcrypt";
+const saltRounds = 8;
 import { database } from "./knex";
 import { loginRequest, registerRequest } from "./global";
 
@@ -24,13 +26,21 @@ app.use(function (req, res, next) {
 
 app.post("/login", async (req: Request, res: Response) => {
   const userCredential: loginRequest = req.body;
-	const result = await database('user')
-		.select("id")
+	const hashPassword = await bcrypt.hash(userCredential.password, saltRounds);
+  const result = await database("user")
+		.select(['id','password'])
 		.where("username", userCredential.username)
-		.andWhere("password", userCredential.password)
 		.first();
 
-  if(result) res.json(result);
+  if(result) {
+    console.log(result, hashPassword, bcrypt.compareSync(userCredential.password, result.password));
+    if(bcrypt.compareSync(userCredential.password, result.password)){
+      res.send("Password giusta!");
+    }
+    else {
+      res.send("Oh no");
+    }
+  }
   else res.sendStatus(500);
 	
 });
@@ -38,7 +48,13 @@ app.post("/login", async (req: Request, res: Response) => {
 app.post("/register", async (req: Request, res: Response) => {
 	const userCredential: registerRequest = req.body;
   try {
-    const result = await database("user").insert(userCredential, ["id"]);
+    const hashPassword = await bcrypt.hash(userCredential.password, saltRounds);
+    const newUserData = {
+      username: userCredential.username,
+      password: hashPassword,
+      email: userCredential.email,
+    }
+    const result = await database("user").insert(newUserData, ["id"]);
     res.json(result);
   } catch (error) {
     res.sendStatus(500);
