@@ -30,6 +30,14 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false
+      - key: PORT
+        sync: false
+      - key: VITE_ORIGIN
+        sync: false
+      - key: SECRET
+        sync: false
+      - key: SALT
+        sync: false
     region: singapore
     buildCommand: npm run build
     startCommand: npm run start
