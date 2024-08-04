@@ -54,6 +54,7 @@ interface infoForPageFromKnex {
 interface loginRequest {
     username: string,
     password: string,
+    id: number
 }
 
 interface registerRequest {

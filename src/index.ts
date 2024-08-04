@@ -37,7 +37,7 @@ app.use(function (req, res, next) {
 });
 
 export const SECRET_KEY: Secret = process.env.SECRET || "Secret-Key";
-const saltRounds = process.env.SALT || 8;
+const saltRounds = Number(process.env.SALT || 8);
 
 export interface CustomRequest extends Request {
 	token: string | JwtPayload;
@@ -90,6 +90,7 @@ app.post("/login", async (req: Request, res: Response) => {
 
 app.post("/register", async (req: Request, res: Response) => {
 	const userCredential: registerRequest = req.body;
+	console.log(req.body);
 	try {
 		const hashPassword = await bcrypt.hash(userCredential.password, saltRounds);
 		const newUserData = {
@@ -97,9 +98,34 @@ app.post("/register", async (req: Request, res: Response) => {
 			password: hashPassword,
 			email: userCredential.email,
 		};
-		const result = await database("user").insert(newUserData, ["id"]);
-		res.json(result);
+		const checkIfExist = await database("user")
+			.select("username")
+			.where("username", newUserData.username)
+			.first();
+		console.log(checkIfExist);
+		if (checkIfExist) {
+			console.log("Already exist");
+			res.sendStatus(409); // Conflict status code
+		} else {
+			const result: loginRequest = await database("user").insert(newUserData, [
+				"id",
+				"username",
+			]);
+			const username = result.username;
+			const id = result.id;
+			const token = jwt.sign(
+				{ id: result.id?.toString(), username: result.username },
+				SECRET_KEY,
+				{
+					expiresIn: "2 days",
+				}
+			);
+
+			const cookie = { username: { id, username }, token: token };
+			res.send(cookie);
+		}
 	} catch (error) {
+		console.log(error);
 		res.sendStatus(500);
 	}
 });
@@ -119,7 +145,7 @@ app.put("/event", auth, (req: Request, res: Response) => {
 	res.json(result);
 });
 
-app.delete("/event/:id",auth, async (req: Request, res: Response) => {
+app.delete("/event/:id", auth, async (req: Request, res: Response) => {
 	const reuslt = await handleDeleteOneEvent(req, res);
 	res.send();
 });
