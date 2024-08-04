@@ -29,7 +29,8 @@ async function handleDeleteOneEvent(req: Request, res: Response) {
 }
 
 async function handleGetAllEventsInfo(req: Request, res: Response) {
-    const eventInfos: eventInfo[] = await selectEachEventInfo()
+    const userId = req.params.user_id;
+    const eventInfos: eventInfo[] = await selectEachEventInfo(userId);
     return eventInfos;
 }
 

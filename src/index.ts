@@ -148,7 +148,7 @@ app.delete("/event/:id", auth, async (req: Request, res: Response) => {
 	res.send();
 });
 
-app.get("/all-events/info", auth, async (req: Request, res: Response) => {
+app.get("/all-events/info/:user_id", auth, async (req: Request, res: Response) => {
 	const result = await handleGetAllEventsInfo(req, res);
 	res.json(result);
 });
