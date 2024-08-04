@@ -90,7 +90,6 @@ app.post("/login", async (req: Request, res: Response) => {
 
 app.post("/register", async (req: Request, res: Response) => {
 	const userCredential: registerRequest = req.body;
-	console.log(req.body);
 	try {
 		const hashPassword = await bcrypt.hash(userCredential.password, saltRounds);
 		const newUserData = {
@@ -125,7 +124,6 @@ app.post("/register", async (req: Request, res: Response) => {
 			res.send(cookie);
 		}
 	} catch (error) {
-		console.log(error);
 		res.sendStatus(500);
 	}
 });
