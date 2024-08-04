@@ -61,6 +61,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
 	}
 };
 
+//Auth login
 app.post("/login", async (req: Request, res: Response) => {
 	const userCredential: loginRequest = req.body;
 	const result = await database("user")
@@ -88,6 +89,7 @@ app.post("/login", async (req: Request, res: Response) => {
 	} else res.sendStatus(500);
 });
 
+//Auth register
 app.post("/register", async (req: Request, res: Response) => {
 	const userCredential: registerRequest = req.body;
 	try {
@@ -129,6 +131,17 @@ app.post("/register", async (req: Request, res: Response) => {
 	}
 });
 
+//Default
+app.get('/', (req: Request, res: Response) => {
+	res.send("Backend server of CommetTo is running well!");
+});
+
+//Default
+app.get('/health', (req: Request, res: Response) => {
+	res.sendStatus(200);
+});
+
+//Event
 app.get("/event/:id", auth, async (req: Request, res: Response) => {
 	const result = await handleGETOneEvent(req, res);
 	res.json(result);
