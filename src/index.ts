@@ -1,49 +1,158 @@
 // src/index.js {path: './.env.local'}
-import express, { Express, Request, Response } from "express";
+import express, {
+	Express,
+	request,
+	Request,
+	Response,
+	Router,
+	NextFunction,
+} from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { handleGETOneEvent, handlePostOneEvent, handlePutOneEvent, handleDeleteOneEvent, handleGetAllEventsInfo } from "./event/event.controller"
+import {
+	handleGETOneEvent,
+	handlePostOneEvent,
+	handlePutOneEvent,
+	handleDeleteOneEvent,
+	handleGetAllEventsInfo,
+} from "./event/event.controller";
+import bcrypt from "bcrypt";
+import jwt, { Secret, JwtPayload } from "jsonwebtoken";
+import { database } from "./knex";
+import { loginRequest, registerRequest } from "./global";
 
-dotenv.config({ path: './.env.local' });
+dotenv.config({ path: "./.env.local" });
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 const corsOptions = {
-  origin: process.env.VITE_ORIGIN
-}
+	origin: process.env.VITE_ORIGIN,
+};
 
-app.use(express.json())
+app.use(express.json());
 app.use(cors(corsOptions));
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE");
-  next();
+	res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE");
+	next();
 });
 
-app.get("/event/:id", async (req: Request, res: Response) => {
-  const result = await handleGETOneEvent(req, res)
-  res.json(result);
+export const SECRET_KEY: Secret = process.env.SECRET || "Secret-Key";
+const saltRounds = Number(process.env.SALT || 8);
+
+export interface CustomRequest extends Request {
+	token: string | JwtPayload;
+}
+
+//Auth middllware
+const auth = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const token = req.header("Authorization");
+
+		if (!token) {
+			throw new Error();
+		}
+
+		const decoded = jwt.verify(token, SECRET_KEY);
+		(req as CustomRequest).token = decoded;
+
+		next();
+	} catch (err) {
+		res.status(401).send("Please authenticate");
+	}
+};
+
+app.post("/login", async (req: Request, res: Response) => {
+	const userCredential: loginRequest = req.body;
+	const result = await database("user")
+		.select(["id", "password"])
+		.where("username", userCredential.username)
+		.first();
+
+	if (result) {
+		const username = result.username;
+		const id = result.id;
+		if (bcrypt.compareSync(userCredential.password, result.password)) {
+			const token = jwt.sign(
+				{ id: result.id?.toString(), username: result.username },
+				SECRET_KEY,
+				{
+					expiresIn: "2 days",
+				}
+			);
+
+			const cookie = { username: { id, username }, token: token };
+			res.send(cookie);
+		} else {
+			res.sendStatus(401);
+		}
+	} else res.sendStatus(500);
 });
 
-app.post("/event", async (req: Request, res: Response) => {
-  const result = await handlePostOneEvent(req, res)
-  res.json(result);
+app.post("/register", async (req: Request, res: Response) => {
+	const userCredential: registerRequest = req.body;
+	try {
+		const hashPassword = await bcrypt.hash(userCredential.password, saltRounds);
+		const newUserData = {
+			username: userCredential.username,
+			password: hashPassword,
+			email: userCredential.email,
+		};
+		const checkIfExist = await database("user")
+			.select("username")
+			.where("username", newUserData.username)
+			.first();
+		console.log(checkIfExist);
+		if (checkIfExist) {
+			console.log("Already exist");
+			res.sendStatus(409); // Conflict status code
+		} else {
+			const result: loginRequest = await database("user").insert(newUserData, [
+				"id",
+				"username",
+			]);
+			const username = result.username;
+			const id = result.id;
+			const token = jwt.sign(
+				{ id: result.id?.toString(), username: result.username },
+				SECRET_KEY,
+				{
+					expiresIn: "2 days",
+				}
+			);
+
+			const cookie = { username: { id, username }, token: token };
+			res.send(cookie);
+		}
+	} catch (error) {
+		res.sendStatus(500);
+	}
 });
 
-app.put("/event", (req: Request, res: Response) => {
-  const result = handlePutOneEvent(req, res)
-  res.json(result)
+app.get("/event/:id", auth, async (req: Request, res: Response) => {
+	const result = await handleGETOneEvent(req, res);
+	res.json(result);
 });
 
-app.delete("/event/:id", async (req: Request, res: Response) => {
-  const reuslt = await handleDeleteOneEvent(req, res)
-  res.send();
+app.post("/event", auth, async (req: Request, res: Response) => {
+	const result = await handlePostOneEvent(req, res);
+	res.json(result);
 });
 
-app.get("/all-events/info", async (req: Request, res: Response) => {
-  const result = await handleGetAllEventsInfo(req, res);
-  res.json(result);
+app.put("/event", auth, (req: Request, res: Response) => {
+	const result = handlePutOneEvent(req, res);
+	res.json(result);
+});
+
+app.delete("/event/:id", auth, async (req: Request, res: Response) => {
+	const reuslt = await handleDeleteOneEvent(req, res);
+	res.send();
+});
+
+app.get("/all-events/info", auth, async (req: Request, res: Response) => {
+	const result = await handleGetAllEventsInfo(req, res);
+	res.json(result);
 });
 
 app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+	console.log(`[server]: Server is running at http://localhost:${port}`);
 });

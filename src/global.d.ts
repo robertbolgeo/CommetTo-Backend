@@ -51,13 +51,27 @@ interface infoForPageFromKnex {
     schedule_desc: string
 }
 
-export {
-    event,
-    eventInfo,
-    schedule,
-    infoForPage,
-    infoForPageFromKnex,
-    eventForJSON,
-    scheduleForJSON,
-    infoForPageForJSON
+interface loginRequest {
+    username: string,
+    password: string,
+    id: number
 }
+
+interface registerRequest {
+	username: string;
+	password: string;
+    email: string
+}
+
+export {
+	event,
+	eventInfo,
+	schedule,
+	infoForPage,
+	infoForPageFromKnex,
+	eventForJSON,
+	scheduleForJSON,
+	infoForPageForJSON,
+	loginRequest,
+	registerRequest,
+};
