@@ -106,10 +106,11 @@ app.post("/register", async (req: Request, res: Response) => {
 			console.log("Already exist");
 			res.sendStatus(409); // Conflict status code
 		} else {
-			const result: loginRequest = await database("user").insert(newUserData, [
+			const results: loginRequest[] = await database("user").insert(newUserData, [
 				"id",
 				"username",
 			]);
+			const result = results[0];
 			const username = result.username;
 			const id = result.id;
 			const token = jwt.sign(
