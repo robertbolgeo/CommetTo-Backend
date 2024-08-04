@@ -36,6 +36,7 @@ interface infoForPage {
 
 interface infoForPageForJSON {
     overview: eventForJSON,
+    user_id: string,
     schedule: scheduleForJSON[]
 }
 
