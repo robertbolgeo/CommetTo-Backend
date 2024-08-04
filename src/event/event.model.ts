@@ -51,11 +51,13 @@ async function selectEachEventInfo(user_id: string) {
 
 //insert
 async function insertDetailOfEvent(newEvent: infoForPageForJSON) {
-    const event: eventForJSON = newEvent.overview
-    const schedules: scheduleForJSON[] = newEvent.schedule
-    const insertedEventId = await insertToEvent(event)
-    const insertedScheduleIds = await insertToSchedule(schedules)
-    const eventToSchedule = await insertToEventAndSchedule(insertedEventId, insertedScheduleIds)
+    const event: eventForJSON = newEvent.overview;
+    const schedules: scheduleForJSON[] = newEvent.schedule;
+    const user_id: string = newEvent.user_id;
+    const insertedEventId = await insertToEvent(event);
+    const insertedScheduleIds = await insertToSchedule(schedules);
+    const insertedEventUse = await insertToEventUser(user_id, insertedEventId[0].id);
+    const eventToSchedule = await insertToEventAndSchedule(insertedEventId, insertedScheduleIds);
     return eventToSchedule;
 }
 
@@ -90,6 +92,10 @@ async function insertToSchedule(schedules: scheduleForJSON[]) {
         insertedScheduleIds.push(insertedId[0])
     }
     return insertedScheduleIds;
+}
+
+async function insertToEventUser (user_id: string, event_id: number ){
+    return database("event_user").insert({ event_id: event_id, user_id: user_id});
 }
 
 async function insertToEventAndSchedule(eventIdObj: { id: number }[], scheduleIdsObj: { id: number }[]) {
