@@ -45,7 +45,6 @@ async function selectEachEventInfo(user_id: string) {
 			.join("event", "event.id", "=", "event_user.event_id")
 			.where("event_user.user_id", user_id)
 			.select("id", "name", "date");
-
     return join;
 }
 
@@ -114,11 +113,18 @@ async function insertToEventAndSchedule(eventIdObj: { id: number }[], scheduleId
 async function updateEvent(updatedEvent: infoForPageForJSON) {
     const event: eventForJSON = updatedEvent.overview
     const schedules: scheduleForJSON[] = updatedEvent.schedule
+    //When we try update schedule, new schedule doesn't have id
+    //zero, get schedule id based on event
     const updateddEventId: number = await updateToEvent(event)
-    const updatedScheduleIds: number[] = await updateToSchedule(schedules)
-    const deleted = await deleteToEventAndSchedule(event.id)
-    const eventToSchedule = await insertToEventAndSchedule([{ id: updateddEventId }], updatedScheduleIds.map((i) => { return { id: i } }))
-    return eventToSchedule;
+    const shouldBeDeletedSchedule = await selectSchedules(event.id.toString())
+    //first, delete schedule, schedule-event
+    const deletedSchedules = await deleteToSchedule(shouldBeDeletedSchedule.map((e)=>e.schedule_id))
+    const deletedRelations = await deleteToEventAndSchedule(event.id)
+    //second, insert schedule, then insert schedule-event
+    const insertedSchedules = await insertToSchedule(schedules)
+    const insertedRelations = await insertToEventAndSchedule([{id:event.id}], insertedSchedules)
+
+    return insertedRelations;
 }
 
 async function updateToEvent(event: eventForJSON) {
