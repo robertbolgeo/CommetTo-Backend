@@ -1,0 +1,44 @@
+databases:
+  - name: commetto
+    databaseName: commetto
+    user: commetto_user
+    plan: free
+    region: singapore
+    ipAllowList:
+    - source: 0.0.0.0/0
+      description: everywhere
+    postgresMajorVersion: "14"
+services:
+  - type: web
+    name: commetto-frontend
+    runtime: node
+    repo: https://github.com/FilippoQuattrocchi/CommetTo-Frontend
+    plan: free
+    envVars:
+      - key: VITE_APP_BASE_URL
+        sync: false
+      - key: VITE_APP_PORT
+        sync: false
+    region: singapore
+    buildCommand: npm run build
+    startCommand: npm run preview
+  - type: web
+    name: commetto-backend
+    runtime: node
+    repo: https://github.com/FilippoQuattrocchi/CommetTo-Backend
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: PORT
+        sync: false
+      - key: VITE_ORIGIN
+        sync: false
+      - key: SECRET
+        sync: false
+      - key: SALT
+        sync: false
+    region: singapore
+    buildCommand: npm run build
+    startCommand: npm run start
+version: "1"
