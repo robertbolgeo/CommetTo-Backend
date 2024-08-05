@@ -1,9 +1,9 @@
 interface event {
     id: number,
-    name: string
-    description: string,
-    date: Date,
-    updated_at: Date
+    name?: string
+    description?: string,
+    date: Date | string,
+    updated_at: Date | string
 }
 interface eventForJSON extends event{
     id: number,
