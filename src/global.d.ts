@@ -1,15 +1,11 @@
 interface event {
     id: number,
-    name: string
-    description: string,
-    date: Date,
-    updated_at: Date
+    name?: string
+    description?: string,
+    date: Date | string,
+    updated_at: Date | string
 }
-interface eventForJSON extends event{
-    id: number,
-    date: string,
-    updated_at: string
-}
+
 
 interface eventInfo {
     id: number,
@@ -64,6 +60,18 @@ interface registerRequest {
     email: string
 }
 
+interface group {
+    groupId: number
+    users: userInGroup[],
+    groupName: string
+}
+
+interface userInGroup {
+    id: number
+    accepted: boolean
+    rejected: boolean
+}
+
 export {
 	event,
 	eventInfo,
@@ -75,4 +83,6 @@ export {
 	infoForPageForJSON,
 	loginRequest,
 	registerRequest,
+    group,
+    userInGroup
 };

@@ -1,4 +1,4 @@
-import { event, infoForPage, eventInfo, infoForPageForJSON, infoForPageFromKnex, schedule, eventForJSON, scheduleForJSON } from "../global";
+import { event, infoForPage, eventInfo, infoForPageForJSON, infoForPageFromKnex, schedule, eventForJSON, scheduleForJSON, group, userInGroup } from "../global";
 import { database } from "../knex";
 
 function castResult(result: infoForPageFromKnex[]) {
@@ -47,6 +47,25 @@ async function selectEachEventInfo(user_id: string) {
 			.select("id", "name", "date");
     return join;
 }
+
+async function findGroupsByUser(user_id: string) {
+    const groups: number[] = await database("invitations")
+			.select("group_id")
+			.where("user_id", user_id);
+    return groups;
+}
+
+async function findUsersByGroup(group_id: number) : Promise<group | void>{
+    const userObj: userInGroup[] = await database("invitations")
+    .select("user_id", "accepted", "rejected")
+    .where("group_id", group_id)
+    const groupName: string[] = await database("groups")
+    .select("group_name")
+    .where("group_id", group_id)
+    return {groupId: group_id, users: userObj, groupName: groupName[0]}
+}
+
+
 
 //insert
 async function insertDetailOfEvent(newEvent: infoForPageForJSON) {
@@ -179,6 +198,11 @@ async function deleteToEvent(eventId: number) {
 
 async function deleteToSchedule(scheduleIds: number[]) {
     return await database.from("schedule").whereIn("id", scheduleIds).del()
+}
+
+//
+async function selectUsersInGroup(req: Request, res: Response) {
+    
 }
 
 export {
