@@ -60,6 +60,18 @@ interface registerRequest {
     email: string
 }
 
+interface group {
+    groupId: number
+    users: userInGroup[],
+    groupName: string
+}
+
+interface userInGroup {
+    id: number
+    accepted: boolean
+    rejected: boolean
+}
+
 export {
 	event,
 	eventInfo,
@@ -71,4 +83,6 @@ export {
 	infoForPageForJSON,
 	loginRequest,
 	registerRequest,
+    group,
+    userInGroup
 };

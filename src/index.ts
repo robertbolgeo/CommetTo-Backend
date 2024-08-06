@@ -105,7 +105,7 @@ app.post("/register", async (req: Request, res: Response) => {
 			.first();
 		console.log(checkIfExist);
 		if (checkIfExist) {
-			console.log("Already exist");
+			console.log("Already exists");
 			res.sendStatus(409); // Conflict status code
 		} else {
 			const results: loginRequest[] = await database("user").insert(newUserData, [
