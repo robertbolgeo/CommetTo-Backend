@@ -181,6 +181,8 @@ async function deleteToSchedule(scheduleIds: number[]) {
     return await database.from("schedule").whereIn("id", scheduleIds).del()
 }
 
+
+
 export {
     selectDetailOfEvent,
     insertDetailOfEvent,
