@@ -5,11 +5,7 @@ interface event {
     date: Date | string,
     updated_at: Date | string
 }
-interface eventForJSON extends event{
-    id: number,
-    date: string,
-    updated_at: string
-}
+
 
 interface eventInfo {
     id: number,
